@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Linerunner3D.iml" filepath="$PROJECT_DIR$/Linerunner3D.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Lr3D.iml" filepath="$PROJECT_DIR$/Lr3D.iml" />
       <module fileurl="file://$PROJECT_DIR$/game/game.iml" filepath="$PROJECT_DIR$/game/game.iml" />
     </modules>
   </component>
