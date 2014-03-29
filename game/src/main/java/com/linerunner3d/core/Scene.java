@@ -12,6 +12,7 @@ import com.threed.jpct.ITextureEffect;
 import com.threed.jpct.Light;
 import com.threed.jpct.Loader;
 import com.threed.jpct.Logger;
+import com.threed.jpct.Matrix;
 import com.threed.jpct.Object3D;
 import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
@@ -122,11 +123,15 @@ public class Scene implements GLSurfaceView.Renderer {
 
         // ========== Add the plane ============
 
-        tm.addTexture("spaceship", new Texture(res.openRawResource(R.raw.ship)));
-        Object3D[] list = Loader.loadOBJ(res.openRawResource(R.raw.spaceship), res.openRawResource(R.raw.mtl_spaceship), 1f);
-        Object3D obj = list[list.length-1];
-        obj.setTexture("spaceship");
-        obj.setOrigin(SimpleVector.create(0,0,0));
+        //tm.addTexture("spaceship", new Texture(res.openRawResource(R.raw.ship)));
+        Object3D[] list = Loader.load3DS(res.openRawResource(R.raw.mesh), 1.f);
+        //  Loader.loadOBJ(res.openRawResource(R.raw.spaceship), res.openRawResource(R.raw.mtl_spaceship), 1f);
+        Object3D obj = list[0];
+        Matrix m = new Matrix();
+        m.rotateX(-20);
+        obj.setRotationMatrix(m);
+        //obj.setTexture("spaceship");
+        //obj.setOrigin(SimpleVector.create(0,0,0));
         obj.build();
 
         world.addObject(obj);
@@ -144,7 +149,7 @@ public class Scene implements GLSurfaceView.Renderer {
         // ========== Camera config ============
 
         Camera cam = world.getCamera();
-        cam.moveCamera(Camera.CAMERA_MOVEOUT, 30);
+        cam.moveCamera(Camera.CAMERA_MOVEOUT, 15);
         cam.lookAt(obj.getTransformedCenter());
 
         MemoryHelper.compact();
