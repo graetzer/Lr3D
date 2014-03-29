@@ -1,4 +1,4 @@
-package org.graetzer.linerunner3d;
+package com.linerunner3d;
 
 import java.lang.reflect.Field;
 
