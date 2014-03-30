@@ -59,13 +59,14 @@ public class Scene implements GLSurfaceView.Renderer {
         world = new World();
 
         TextureManager tm = TextureManager.getInstance();
-        if(!tm.containsTexture("white")) {
-            tm.addTexture("white", new Texture(res.openRawResource(R.drawable.skybox)));
+        if(!tm.containsTexture("skybox")) {
+            tm.addTexture("skybox", new Texture(res.openRawResource(R.drawable.skybox)));
+            tm.addTexture("skybox2", new Texture(res.openRawResource(R.drawable.skybox_mirror)));
         }
 
         // ========== Skybox ============
 
-        mSkybox = new SkyBox("white", "white","white","white","white","white", 30);
+        mSkybox = new SkyBox("skybox", "skybox2","skybox","skybox2","skybox","skybox", 30);
 
         // ========== Font for the rendering ============
         font = new Texture(res.openRawResource(R.raw.numbers));
@@ -205,9 +206,7 @@ public class Scene implements GLSurfaceView.Renderer {
 
 
         double secs = now * 0.001;
-        Logger.log("Time "+secs);
         SimpleVector x = new SimpleVector(Math.cos(secs)*5, 0, Math.sin(secs)*5);
-     //   Logger.log(x.toString());
         world.getCamera().setPosition(x);
         world.getCamera().lookAt(SimpleVector.ORIGIN);
     }
