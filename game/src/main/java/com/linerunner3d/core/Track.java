@@ -23,7 +23,7 @@ public class Track {
     public static Track createTrack(Context ctx, World world) {
         Track t = new Track();
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 10; i++) {
             Object3D obj = ExtendedPrimitives.createBox(SimpleVector.create(30.f, 0.5f, 3.f));
             t.mTrackParts.add(obj);
             world.addObject(obj);

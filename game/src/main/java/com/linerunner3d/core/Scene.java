@@ -60,7 +60,7 @@ public class Scene implements GLSurfaceView.Renderer {
 
         TextureManager tm = TextureManager.getInstance();
         if(!tm.containsTexture("white")) {
-            tm.addTexture("white", new Texture(res.openRawResource(R.drawable.texture_skybox)));
+            tm.addTexture("white", new Texture(res.openRawResource(R.drawable.skybox)));
         }
 
         // ========== Skybox ============
@@ -150,6 +150,7 @@ public class Scene implements GLSurfaceView.Renderer {
         world.draw(mFB);
         blitNumber(lfps, 5, 5);
         mFB.display();
+
     }
 
     private void blitNumber(int number, int x, int y) {
@@ -169,6 +170,9 @@ public class Scene implements GLSurfaceView.Renderer {
 //        Matrix m = mStickman.getRotationMatrix();
 //        m.rotateX(5*x);
 //        m.rotateY(5*y);
+        SimpleVector abc = new SimpleVector(Math.cos(frameTimeMilli/1000.f)*5, 0, Math.sin(frameTimeMilli/1000.f)*5);
+        world.getCamera().setPosition(abc);
+        world.getCamera().lookAt(SimpleVector.ORIGIN);
     }
 
     private static final int GRANULARITY_MILLI = 25;
@@ -198,6 +202,14 @@ public class Scene implements GLSurfaceView.Renderer {
         mStickman.update(now, animateSeconds);
         mTrack.update(now, animateSeconds);
         mObstacles.update(now, animateSeconds);
+
+
+        double secs = now * 0.001;
+        Logger.log("Time "+secs);
+        SimpleVector x = new SimpleVector(Math.cos(secs)*5, 0, Math.sin(secs)*5);
+     //   Logger.log(x.toString());
+        world.getCamera().setPosition(x);
+        world.getCamera().lookAt(SimpleVector.ORIGIN);
     }
 
 }
