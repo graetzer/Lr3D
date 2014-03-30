@@ -22,7 +22,7 @@ public class Obstacles {
 
         for (int i = 0; i < MAX_ELEMENTS; i++) {
 
-            Object3D box = Primitives.getBox(1.5, 1);
+            Object3D box = Primitives.getBox(1.5f, 1.f);
             o.mBoxes.add(box);
             world.addObject(box);
 
@@ -34,8 +34,8 @@ public class Obstacles {
      * Set a difficulty level
      * @param x Parameter between 0.f and 1.f
      */
-    public setDifficulty(float x) {
-        difficulty = Math.max(0, Math.min(1.0, x));
+    public void setDifficulty(float x) {
+        difficulty = (float)Math.max(0, Math.min(1.0, x));
     }
 
     public void update(float currentTime, float deltaTime) {

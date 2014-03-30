@@ -103,6 +103,7 @@ public class Scene implements GLSurfaceView.Renderer {
 
         Camera cam = world.getCamera();
         cam.moveCamera(Camera.CAMERA_MOVEOUT, 15);
+        cam.moveCamera(Camera.CAMERA_MOVEUP, 10);
         cam.lookAt(new SimpleVector(0,0,0));//mStickman.getTransformedCenter()
 
         MemoryHelper.compact();
@@ -196,6 +197,7 @@ public class Scene implements GLSurfaceView.Renderer {
 
         mStickman.update(now, animateSeconds);
         mTrack.update(now, animateSeconds);
+        mObstacles.update(now, animateSeconds);
     }
 
 }
