@@ -9,7 +9,6 @@ import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
 import com.threed.jpct.Light;
 import com.threed.jpct.Logger;
-import com.threed.jpct.Matrix;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
@@ -39,14 +38,13 @@ public class Scene implements GLSurfaceView.Renderer {
 
     private Light light;
 
-    private long time = System.currentTimeMillis();
-
     private FrameBuffer mFB = null;
     private SkyBox mSkybox = null;
     private World world = null;
-    private RGBColor back = new RGBColor(50, 50, 100);
 
     private Stickman mStickman;
+    private Track mTrack;
+    private Obstacles mObstacles;
 
     public Scene(Context ctx) {
         mCtx = ctx.getApplicationContext();
@@ -73,9 +71,11 @@ public class Scene implements GLSurfaceView.Renderer {
         font = new Texture(res.openRawResource(R.raw.numbers));
         font.setMipmap(false);
 
-        // ========== Add the Stickman ============
+        // ========== Add the Game Objects ============
 
         mStickman = Stickman.createStickman(mCtx, world);
+        mTrack = Track.createTrack(mCtx, world);
+        mObstacles = Obstacles.create(mCtx, world);
 
         /*
         //tm.addTexture("spaceship", new Texture(res.openRawResource(R.raw.ship)));
@@ -94,7 +94,7 @@ public class Scene implements GLSurfaceView.Renderer {
         light = new Light(world);
         light.enable();
 
-        light.setIntensity(60, 120, 50);
+        light.setIntensity(80, 80, 80);
         light.setPosition(SimpleVector.create(-10, -50, -100));
 
         world.setAmbientLight(10, 10, 10);
@@ -141,24 +141,14 @@ public class Scene implements GLSurfaceView.Renderer {
             mFB = new FrameBuffer(mWidth, mHeight);
         }
 
+        updateWorld();
 
-
-        mFB.clear(back);
+        mFB.clear();
         mSkybox.render(world, mFB);
-
-        mStickman.updateAnimations();
-
         world.renderScene(mFB);
         world.draw(mFB);
         blitNumber(lfps, 5, 5);
         mFB.display();
-
-        if (System.currentTimeMillis() - time >= 1000) {
-            lfps = fps;
-            fps = 0;
-            time = System.currentTimeMillis();
-        }
-        fps++;
     }
 
     private void blitNumber(int number, int x, int y) {
@@ -178,6 +168,34 @@ public class Scene implements GLSurfaceView.Renderer {
 //        Matrix m = mStickman.getRotationMatrix();
 //        m.rotateX(5*x);
 //        m.rotateY(5*y);
+    }
+
+    private static final int GRANULARITY_MILLI = 25;
+    private long frameTimeMilli = System.currentTimeMillis();
+    private long aggregatedTimeMilli = 0;
+    private float speed = 1f;
+
+    private void updateWorld() {
+        long now = System.currentTimeMillis();
+        long diff = (now - frameTimeMilli);
+        aggregatedTimeMilli += diff;
+        frameTimeMilli = now;
+
+        float animateSeconds  = 0f;// Time to simulate
+        while (aggregatedTimeMilli > GRANULARITY_MILLI) {
+            aggregatedTimeMilli -= GRANULARITY_MILLI;
+            animateSeconds += GRANULARITY_MILLI * 0.001f * speed;
+            //cameraController.placeCamera();
+        }
+
+        if (diff >= 1000) {
+            lfps = fps;
+            fps = 0;
+        }
+        fps++;
+
+        mStickman.update(now, animateSeconds);
+        mTrack.update(now, animateSeconds);
     }
 
 }

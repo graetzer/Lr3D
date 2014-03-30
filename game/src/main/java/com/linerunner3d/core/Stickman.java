@@ -27,10 +27,6 @@ public class Stickman {
 
     private static final boolean MESH_ANIM_ALLOWED = false;
 
-    /** ninja placement locations. values are in angles */
-    private static final float[] LOCATIONS = new float[] {0, 180, 90, 270, 45, 225, 315, 135};
-
-
     private Stickman() {}
 
     public static Stickman createStickman(Context ctx, World world) {
@@ -40,36 +36,23 @@ public class Stickman {
 
         try {
             man.mAnimGroup = BonesIO.loadGroup(res.openRawResource(R.raw.stickman));
-            if (MESH_ANIM_ALLOWED) man.createMeshKeyFrames();
+            if (MESH_ANIM_ALLOWED) {
+                man.createMeshKeyFrames();
+            }
 
-            //man.addNinja();
         } catch (Exception e) {
             Logger.log(e);
         }
 
-        float radius = 3, angle = 10;
         man.mAnimGroup.setSkeletonPose(new SkeletonPose(man.mAnimGroup.get(0).getSkeleton()));
-        man.mAnimGroup.getRoot().translate((float)(Math.cos(angle) * radius), 0, (float)(Math.sin(angle) * radius));
+        man.mAnimGroup.getRoot().scale(0.3f);
+
+        man.mAnimGroup.getRoot().rotateY((float)-Math.PI/2);
+        man.mAnimGroup.getRoot().rotateZ((float)Math.PI);
+        man.mAnimGroup.getRoot().translate(-2, 2.5f, 0);
         man.mAnimGroup.addToWorld(world);
 
         return man;
-    }
-
-    private void addNinja() {
-      /*  if (ninjas.size() == LOCATIONS.length)
-            return;
-
-        AnimatedGroup ninja = mAnimGroup.clone(AnimatedGroup.MESH_DONT_REUSE);
-        float[] bb = renderer.calcBoundingBox();
-        float radius = (bb[3] - bb[2]) * 0.5f; // half of height
-        double angle = Math.toRadians(LOCATIONS[ninjas.size()]);
-
-        ninja.setSkeletonPose(new SkeletonPose(ninja.get(0).getSkeleton()));
-        ninja.getRoot().translate((float)(Math.cos(angle) * radius), 0, (float)(Math.sin(angle) * radius));
-
-        ninja.addToWorld(world);
-        ninjas.add(ninja);
-        Logger.log("added new ninja: " + ninjas.size());*/
     }
 
     private void createMeshKeyFrames() {
@@ -126,53 +109,26 @@ public class Stickman {
         Logger.log("created mesh keyframes, " + keyframeCount + "x" + mAnimGroup.getSize());
     }
 
-    private static final int GRANULARITY = 25;
-    private long frameTime = System.currentTimeMillis();
-    private long aggregatedTime = 0;
-    private float animateSeconds  = 0f;
-    private float speed = 1f;
-
-    public void updateAnimations() {
-
-        long now = System.currentTimeMillis();
-        aggregatedTime += (now - frameTime);
-        frameTime = now;
-
-        while (aggregatedTime > GRANULARITY) {
-            aggregatedTime -= GRANULARITY;
-            animateSeconds += GRANULARITY * 0.001f * speed;
-            //cameraController.placeCamera();
-        }
-
-        int animation = 1;
+    public void update(float currentTime, float deltaTime) {
+        int animation = 0;
         boolean useMeshAnim = false;
 
-        if (animation > 0 && mAnimGroup.getSkinClipSequence().getSize() >= animation) {
-            float clipTime = mAnimGroup.getSkinClipSequence().getClip(animation-1).getTime();
-            if (animateSeconds > clipTime) {
-                animateSeconds = 0;
+        if (mAnimGroup.getSkinClipSequence().getSize() >= animation) {
+            currentTime += deltaTime;
+            float clipTime = mAnimGroup.getSkinClipSequence().getClip(animation).getTime();
+            if (currentTime > clipTime) {
+                currentTime = 0;
             }
-            float index = animateSeconds / clipTime;
+            float index = currentTime / clipTime;
             if (useMeshAnim) {
                 for (Animated3D a : mAnimGroup)
                     a.animate(index, animation);
-                /*for (AnimatedGroup group : ninjas) {
-                    for (Animated3D a : group)
-                        a.animate(index, animation);
-                }*/
             } else {
                 mAnimGroup.animateSkin(index, animation);
                 if (!mAnimGroup.isAutoApplyAnimation())
                     mAnimGroup.applyAnimation();
-                /*for (AnimatedGroup group : ninjas) {
-                    group.animateSkin(index, animation);
-//							if (!group.isAutoApplyAnimation())
-//								group.applyAnimation();
-                }*/
             }
 
-        } else {
-            animateSeconds = 0f;
         }
     }
 }

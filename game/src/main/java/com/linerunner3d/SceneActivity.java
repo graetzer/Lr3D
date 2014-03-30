@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.linerunner3d.core.Scene;
 import com.threed.jpct.Logger;
+import com.threed.jpct.util.AAConfigChooser;
 
 /**
  * Created by simon on 30.03.14.
@@ -31,6 +32,7 @@ public class SceneActivity extends Activity {
         mGLView = new GLSurfaceView(getApplication());
         // Enable the OpenGL ES2.0 context
         mGLView.setEGLContextClientVersion(2);
+        mGLView.setEGLConfigChooser(new AAConfigChooser(mGLView, false));
 
         mScene = new Scene(this);
         mGLView.setRenderer(mScene);
