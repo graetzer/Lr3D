@@ -2,6 +2,10 @@ package com.linerunner3d;
 
 import android.app.Activity;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import android.content.Intent;
+>>>>>>> FETCH_HEAD
 =======
 import android.content.Intent;
 >>>>>>> FETCH_HEAD
@@ -11,6 +15,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+<<<<<<< HEAD
 <<<<<<< HEAD
 import android.widget.RelativeLayout;
 import android.view.WindowManager;
@@ -39,12 +44,28 @@ public class MainActivity extends Activity {
     private GLSurfaceView mGLView;
     private Scene mScene = null;
 >>>>>>> FETCH_HEAD
+=======
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.Toast;
+
+import com.linerunner3d.core.Scene;
+import com.threed.jpct.Logger;
+
+
+public class MainActivity extends Activity {
+
+    private GLSurfaceView mGLView;
+    private Scene mScene = null;
+>>>>>>> FETCH_HEAD
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Logger.log("onCreate");
         super.onCreate(savedInstanceState);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         mGLView = new GLSurfaceView(getApplication());
 
@@ -80,6 +101,8 @@ public class MainActivity extends Activity {
         Logger.log("onStop");
         super.onStop();
 =======
+=======
+>>>>>>> FETCH_HEAD
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
@@ -91,6 +114,9 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
+<<<<<<< HEAD
+>>>>>>> FETCH_HEAD
+=======
 >>>>>>> FETCH_HEAD
     }
 }
