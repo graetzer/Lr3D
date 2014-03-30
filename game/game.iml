@@ -71,7 +71,11 @@
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="jpct_ae" level="project" />
+    <orderEntry type="library" exported="" name="jme-ogrexml-2.1" level="project" />
+    <orderEntry type="library" exported="" name="bones" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="jme-model-2.1" level="project" />
+    <orderEntry type="library" exported="" name="jme-2.1" level="project" />
   </component>
 </module>
 

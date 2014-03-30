@@ -52,10 +52,68 @@ public class Scene implements GLSurfaceView.Renderer {
     private World world = null;
     private RGBColor back = new RGBColor(50, 50, 100);
 
+    private Object3D mStickman;
+
     public Scene(Context ctx) {
         mCtx = ctx.getApplicationContext();
         Texture.defaultToMipmapping(true);
         Texture.defaultTo4bpp(true);
+    }
+
+    private void initResources() {
+
+        Resources res = mCtx.getResources();
+        Logger.log("Initializing game...");
+        world = new World();
+
+        TextureManager tm = TextureManager.getInstance();
+
+        if(!tm.containsTexture("white")) {
+            tm.addTexture("white", new Texture(res.openRawResource(R.raw.texture_paper)));
+        }
+
+        // ========== Skybox ============
+
+        mSkybox = new SkyBox("white", "white","white","white","white","white", 30);
+
+        // ========== Font for the rendering ============
+        font = new Texture(res.openRawResource(R.raw.numbers));
+        font.setMipmap(false);
+
+        // ========== Add the plane ============
+
+        //tm.addTexture("spaceship", new Texture(res.openRawResource(R.raw.ship)));
+        Object3D[] list = Loader.load3DS(res.openRawResource(R.raw.mesh), 1.f);
+        //  Loader.loadOBJ(res.openRawResource(R.raw.spaceship), res.openRawResource(R.raw.mtl_spaceship), 1f);
+        mStickman = list[0];
+        Matrix m = new Matrix();
+        m.rotateX(-20);
+        mStickman.setRotationMatrix(m);
+        //obj.setTexture("spaceship");
+        //obj.setOrigin(SimpleVector.create(0,0,0));
+        mStickman.build();
+
+        world.addObject(mStickman);
+
+        // ========== Lighting ============
+
+        light = new Light(world);
+        light.enable();
+
+        light.setIntensity(60, 120, 50);
+        light.setPosition(SimpleVector.create(-10, -50, -100));
+
+        world.setAmbientLight(10, 10, 10);
+
+        // ========== Camera config ============
+
+        Camera cam = world.getCamera();
+        cam.moveCamera(Camera.CAMERA_MOVEOUT, 15);
+        cam.lookAt(mStickman.getTransformedCenter());
+
+        MemoryHelper.compact();
+
+        world.compileAllObjects();
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -89,7 +147,7 @@ public class Scene implements GLSurfaceView.Renderer {
         }
 
         fb.clear(back);
-//        mSkybox.render(world, fb);
+        mSkybox.render(world, fb);
         world.renderScene(fb);
         world.draw(fb);
         blitNumber(lfps, 5, 5);
@@ -103,60 +161,6 @@ public class Scene implements GLSurfaceView.Renderer {
         fps++;
     }
 
-    private void initResources() {
-
-        Resources res = mCtx.getResources();
-        Logger.log("Initializing game...");
-        world = new World();
-
-        TextureManager tm = TextureManager.getInstance();
-
-        // ========== Skybox ============
-
-        tm.addTexture("white", new Texture(res.openRawResource(R.raw.white)));
-        mSkybox = new SkyBox("white", "white","white","white","white","white", 50);
-
-
-        // ========== Font for the rendering ============
-        font = new Texture(res.openRawResource(R.raw.numbers));
-        font.setMipmap(false);
-
-        // ========== Add the plane ============
-
-        //tm.addTexture("spaceship", new Texture(res.openRawResource(R.raw.ship)));
-        Object3D[] list = Loader.load3DS(res.openRawResource(R.raw.mesh), 1.f);
-        //  Loader.loadOBJ(res.openRawResource(R.raw.spaceship), res.openRawResource(R.raw.mtl_spaceship), 1f);
-        Object3D obj = list[0];
-        Matrix m = new Matrix();
-        m.rotateX(-20);
-        obj.setRotationMatrix(m);
-        //obj.setTexture("spaceship");
-        //obj.setOrigin(SimpleVector.create(0,0,0));
-        obj.build();
-
-        world.addObject(obj);
-
-        // ========== Lighting ============
-
-        light = new Light(world);
-        light.enable();
-
-        light.setIntensity(60, 120, 50);
-        light.setPosition(SimpleVector.create(-10, -50, -100));
-
-        world.setAmbientLight(10, 10, 10);
-
-        // ========== Camera config ============
-
-        Camera cam = world.getCamera();
-        cam.moveCamera(Camera.CAMERA_MOVEOUT, 15);
-        cam.lookAt(obj.getTransformedCenter());
-
-        MemoryHelper.compact();
-
-        world.compileAllObjects();
-    }
-
     private void blitNumber(int number, int x, int y) {
         if (font != null) {
             String sNum = Integer.toString(number);
@@ -168,6 +172,12 @@ public class Scene implements GLSurfaceView.Renderer {
                 x += 5;
             }
         }
+    }
+
+    public void rotate(float x, float y) {
+        Matrix m = mStickman.getRotationMatrix();
+        m.rotateX(5*x);
+        m.rotateY(5*y);
     }
 
 }

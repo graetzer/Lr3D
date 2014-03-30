@@ -21,5 +21,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile files('libs/jpct_ae.jar')
+    compile files('libs/bones.jar')
     compile 'com.android.support:support-v4:+'
 }
