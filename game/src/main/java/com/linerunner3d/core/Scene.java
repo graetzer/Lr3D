@@ -7,18 +7,12 @@ import android.opengl.GLSurfaceView;
 import com.linerunner3d.R;
 import com.threed.jpct.Camera;
 import com.threed.jpct.FrameBuffer;
-import com.threed.jpct.GLSLShader;
-import com.threed.jpct.ITextureEffect;
 import com.threed.jpct.Light;
-import com.threed.jpct.Loader;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Matrix;
-import com.threed.jpct.Object3D;
-import com.threed.jpct.Primitives;
 import com.threed.jpct.RGBColor;
 import com.threed.jpct.SimpleVector;
 import com.threed.jpct.Texture;
-import com.threed.jpct.TextureInfo;
 import com.threed.jpct.TextureManager;
 import com.threed.jpct.World;
 import com.threed.jpct.util.MemoryHelper;
@@ -47,60 +41,17 @@ public class Scene implements GLSurfaceView.Renderer {
 
     private long time = System.currentTimeMillis();
 
-    private FrameBuffer fb = null;
+    private FrameBuffer mFB = null;
     private SkyBox mSkybox = null;
     private World world = null;
     private RGBColor back = new RGBColor(50, 50, 100);
+
+    private Stickman mStickman;
 
     public Scene(Context ctx) {
         mCtx = ctx.getApplicationContext();
         Texture.defaultToMipmapping(true);
         Texture.defaultTo4bpp(true);
-    }
-
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        Logger.log("onSurfaceCreated");
-    }
-
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        mWidth = width;
-        mHeight = height;
-
-        if (lastInstance != gl) {
-            Logger.log("Setting buffer creation flag...");
-            this.hasToCreateBuffer = true;
-        }
-
-        if (fb == null) {
-            Logger.log("Initializing buffer...");
-            fb = new FrameBuffer(mWidth, mHeight);
-
-            initResources();
-        }
-
-        lastInstance = gl;
-    }
-
-    public void onDrawFrame(GL10 gl) {
-        if (this.hasToCreateBuffer) {
-            Logger.log("Recreating buffer...");
-            hasToCreateBuffer = false;
-            fb = new FrameBuffer(mWidth, mHeight);
-        }
-
-        fb.clear(back);
-//        mSkybox.render(world, fb);
-        world.renderScene(fb);
-        world.draw(fb);
-        blitNumber(lfps, 5, 5);
-        fb.display();
-
-        if (System.currentTimeMillis() - time >= 1000) {
-            lfps = fps;
-            fps = 0;
-            time = System.currentTimeMillis();
-        }
-        fps++;
     }
 
     private void initResources() {
@@ -110,31 +61,33 @@ public class Scene implements GLSurfaceView.Renderer {
         world = new World();
 
         TextureManager tm = TextureManager.getInstance();
+        if(!tm.containsTexture("white")) {
+            tm.addTexture("white", new Texture(res.openRawResource(R.drawable.texture_paper)));
+        }
 
         // ========== Skybox ============
 
-        tm.addTexture("white", new Texture(res.openRawResource(R.raw.white)));
-        mSkybox = new SkyBox("white", "white","white","white","white","white", 50);
-
+        mSkybox = new SkyBox("white", "white","white","white","white","white", 30);
 
         // ========== Font for the rendering ============
         font = new Texture(res.openRawResource(R.raw.numbers));
         font.setMipmap(false);
 
-        // ========== Add the plane ============
+        // ========== Add the Stickman ============
 
+        mStickman = Stickman.createStickman(mCtx, world);
+
+        /*
         //tm.addTexture("spaceship", new Texture(res.openRawResource(R.raw.ship)));
         Object3D[] list = Loader.load3DS(res.openRawResource(R.raw.mesh), 1.f);
         //  Loader.loadOBJ(res.openRawResource(R.raw.spaceship), res.openRawResource(R.raw.mtl_spaceship), 1f);
-        Object3D obj = list[0];
+        mStickman = list[0];
         Matrix m = new Matrix();
         m.rotateX(-20);
-        obj.setRotationMatrix(m);
-        //obj.setTexture("spaceship");
-        //obj.setOrigin(SimpleVector.create(0,0,0));
-        obj.build();
+        mStickman.setRotationMatrix(m);
+        mStickman.build();
 
-        world.addObject(obj);
+        world.addObject(mStickman);*/
 
         // ========== Lighting ============
 
@@ -150,11 +103,62 @@ public class Scene implements GLSurfaceView.Renderer {
 
         Camera cam = world.getCamera();
         cam.moveCamera(Camera.CAMERA_MOVEOUT, 15);
-        cam.lookAt(obj.getTransformedCenter());
+        cam.lookAt(new SimpleVector(0,0,0));//mStickman.getTransformedCenter()
 
         MemoryHelper.compact();
 
         world.compileAllObjects();
+    }
+
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
+        Logger.log("onSurfaceCreated");
+        initResources();
+    }
+
+    public void onSurfaceChanged(GL10 gl, int width, int height) {
+        mWidth = width;
+        mHeight = height;
+
+        if (lastInstance != gl) {
+            Logger.log("Setting buffer creation flag...");
+            this.hasToCreateBuffer = true;
+        }
+
+        if (mFB == null) {
+            Logger.log("Initializing buffer...");
+            mFB = new FrameBuffer(mWidth, mHeight);
+            //initResources();
+        }
+
+        lastInstance = gl;
+    }
+
+    public void onDrawFrame(GL10 gl) {
+        if (this.hasToCreateBuffer) {
+            Logger.log("Recreating buffer...");
+            hasToCreateBuffer = false;
+            mFB = new FrameBuffer(mWidth, mHeight);
+        }
+
+
+
+        mFB.clear(back);
+        mSkybox.render(world, mFB);
+
+        mStickman.updateAnimations();
+
+        world.renderScene(mFB);
+        world.draw(mFB);
+        blitNumber(lfps, 5, 5);
+        mFB.display();
+
+        if (System.currentTimeMillis() - time >= 1000) {
+            lfps = fps;
+            fps = 0;
+            time = System.currentTimeMillis();
+        }
+        fps++;
     }
 
     private void blitNumber(int number, int x, int y) {
@@ -164,10 +168,16 @@ public class Scene implements GLSurfaceView.Renderer {
             for (int i = 0; i < sNum.length(); i++) {
                 char cNum = sNum.charAt(i);
                 int iNum = cNum - 48;
-                fb.blit(font, iNum * 5, 0, x, y, 5, 9, 5, 9, 10, true, null);
+                mFB.blit(font, iNum * 5, 0, x, y, 5, 9, 5, 9, 10, true, null);
                 x += 5;
             }
         }
+    }
+
+    public void rotate(float x, float y) {
+//        Matrix m = mStickman.getRotationMatrix();
+//        m.rotateX(5*x);
+//        m.rotateY(5*y);
     }
 
 }
