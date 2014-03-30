@@ -1,4 +1,4 @@
-package com.linerunner3d;
+package com.linerunner3d.core;
 
 /**
  *

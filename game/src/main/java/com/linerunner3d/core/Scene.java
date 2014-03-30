@@ -69,7 +69,7 @@ public class Scene implements GLSurfaceView.Renderer {
         TextureManager tm = TextureManager.getInstance();
 
         if(!tm.containsTexture("white")) {
-            tm.addTexture("white", new Texture(res.openRawResource(R.raw.texture_paper)));
+            tm.addTexture("white", new Texture(res.openRawResource(R.drawable.texture_paper)));
         }
 
         // ========== Skybox ============
