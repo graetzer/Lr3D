@@ -8,10 +8,12 @@ import com.threed.jpct.Animation;
 import com.threed.jpct.Config;
 import com.threed.jpct.Logger;
 import com.threed.jpct.Mesh;
+import com.threed.jpct.World;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import raft.jpct.bones.Animated3D;
 import raft.jpct.bones.AnimatedGroup;
 import raft.jpct.bones.BonesIO;
 import raft.jpct.bones.SkeletonPose;
@@ -22,7 +24,6 @@ import raft.jpct.bones.SkinClip;
  */
 public class Stickman {
     private AnimatedGroup mAnimGroup;
-    private final List<AnimatedGroup> ninjas = new LinkedList<AnimatedGroup>();
 
     private static final boolean MESH_ANIM_ALLOWED = false;
 
@@ -32,7 +33,7 @@ public class Stickman {
 
     private Stickman() {}
 
-    public static Stickman createStickman(Context ctx) {
+    public static Stickman createStickman(Context ctx, World world) {
         Resources res = ctx.getResources();
 
         Stickman man = new Stickman();
@@ -41,10 +42,16 @@ public class Stickman {
             man.mAnimGroup = BonesIO.loadGroup(res.openRawResource(R.raw.stickman));
             if (MESH_ANIM_ALLOWED) man.createMeshKeyFrames();
 
-            man.addNinja();
+            //man.addNinja();
         } catch (Exception e) {
             Logger.log(e);
         }
+
+        float radius = 3, angle = 10;
+        man.mAnimGroup.setSkeletonPose(new SkeletonPose(man.mAnimGroup.get(0).getSkeleton()));
+        man.mAnimGroup.getRoot().translate((float)(Math.cos(angle) * radius), 0, (float)(Math.sin(angle) * radius));
+        man.mAnimGroup.addToWorld(world);
+
         return man;
     }
 
@@ -117,5 +124,55 @@ public class Stickman {
         mAnimGroup.applyAnimation();
 
         Logger.log("created mesh keyframes, " + keyframeCount + "x" + mAnimGroup.getSize());
+    }
+
+    private static final int GRANULARITY = 25;
+    private long frameTime = System.currentTimeMillis();
+    private long aggregatedTime = 0;
+    private float animateSeconds  = 0f;
+    private float speed = 1f;
+
+    public void updateAnimations() {
+
+        long now = System.currentTimeMillis();
+        aggregatedTime += (now - frameTime);
+        frameTime = now;
+
+        while (aggregatedTime > GRANULARITY) {
+            aggregatedTime -= GRANULARITY;
+            animateSeconds += GRANULARITY * 0.001f * speed;
+            //cameraController.placeCamera();
+        }
+
+        int animation = 1;
+        boolean useMeshAnim = false;
+
+        if (animation > 0 && mAnimGroup.getSkinClipSequence().getSize() >= animation) {
+            float clipTime = mAnimGroup.getSkinClipSequence().getClip(animation-1).getTime();
+            if (animateSeconds > clipTime) {
+                animateSeconds = 0;
+            }
+            float index = animateSeconds / clipTime;
+            if (useMeshAnim) {
+                for (Animated3D a : mAnimGroup)
+                    a.animate(index, animation);
+                /*for (AnimatedGroup group : ninjas) {
+                    for (Animated3D a : group)
+                        a.animate(index, animation);
+                }*/
+            } else {
+                mAnimGroup.animateSkin(index, animation);
+                if (!mAnimGroup.isAutoApplyAnimation())
+                    mAnimGroup.applyAnimation();
+                /*for (AnimatedGroup group : ninjas) {
+                    group.animateSkin(index, animation);
+//							if (!group.isAutoApplyAnimation())
+//								group.applyAnimation();
+                }*/
+            }
+
+        } else {
+            animateSeconds = 0f;
+        }
     }
 }
