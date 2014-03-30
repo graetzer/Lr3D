@@ -67,7 +67,6 @@ public class Scene implements GLSurfaceView.Renderer {
         world = new World();
 
         TextureManager tm = TextureManager.getInstance();
-
         if(!tm.containsTexture("white")) {
             tm.addTexture("white", new Texture(res.openRawResource(R.drawable.texture_paper)));
         }
@@ -89,8 +88,6 @@ public class Scene implements GLSurfaceView.Renderer {
         Matrix m = new Matrix();
         m.rotateX(-20);
         mStickman.setRotationMatrix(m);
-        //obj.setTexture("spaceship");
-        //obj.setOrigin(SimpleVector.create(0,0,0));
         mStickman.build();
 
         world.addObject(mStickman);
@@ -117,7 +114,9 @@ public class Scene implements GLSurfaceView.Renderer {
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
         Logger.log("onSurfaceCreated");
+        initResources();
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -132,8 +131,7 @@ public class Scene implements GLSurfaceView.Renderer {
         if (fb == null) {
             Logger.log("Initializing buffer...");
             fb = new FrameBuffer(mWidth, mHeight);
-
-            initResources();
+            //initResources();
         }
 
         lastInstance = gl;

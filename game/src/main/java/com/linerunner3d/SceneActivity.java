@@ -1,8 +1,10 @@
 package com.linerunner3d;
 
 import android.app.Activity;
+import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;

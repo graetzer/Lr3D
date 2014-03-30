@@ -8,6 +8,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ public class MainActivity extends Activity {
         Logger.log("onCreate");
         super.onCreate(savedInstanceState);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
         Button startButton = (Button)findViewById(R.id.button_start);
