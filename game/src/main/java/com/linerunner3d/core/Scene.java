@@ -96,16 +96,17 @@ public class Scene implements GLSurfaceView.Renderer {
         light.enable();
 
         light.setIntensity(80, 80, 80);
-        light.setPosition(SimpleVector.create(-10, -50, -100));
+        light.setPosition(SimpleVector.create(-10, -50, -100));//*/
 
-        world.setAmbientLight(10, 10, 10);
+        world.setAmbientLight(50, 50, 50);
 
         // ========== Camera config ============
 
         Camera cam = world.getCamera();
-        cam.moveCamera(Camera.CAMERA_MOVEOUT, 15);
-        cam.moveCamera(Camera.CAMERA_MOVEUP, 10);
+        cam.moveCamera(Camera.CAMERA_MOVEOUT, 7.5f);
+        cam.moveCamera(Camera.CAMERA_MOVEUP, 1.2f);
         cam.lookAt(new SimpleVector(0,0,0));//mStickman.getTransformedCenter()
+        cam.moveCamera(Camera.CAMERA_MOVERIGHT, 2.5f);
 
         MemoryHelper.compact();
 
@@ -171,12 +172,10 @@ public class Scene implements GLSurfaceView.Renderer {
 //        Matrix m = mStickman.getRotationMatrix();
 //        m.rotateX(5*x);
 //        m.rotateY(5*y);
-        SimpleVector abc = new SimpleVector(Math.cos(frameTimeMilli/1000.f)*5, 0, Math.sin(frameTimeMilli/1000.f)*5);
-        world.getCamera().setPosition(abc);
-        world.getCamera().lookAt(SimpleVector.ORIGIN);
     }
 
     private static final int GRANULARITY_MILLI = 25;
+    private long startTimeMilli = System.currentTimeMillis();
     private long frameTimeMilli = System.currentTimeMillis();
     private long aggregatedTimeMilli = 0;
     private float speed = 1f;
@@ -184,8 +183,8 @@ public class Scene implements GLSurfaceView.Renderer {
     private void updateWorld() {
         long now = System.currentTimeMillis();
         long diff = (now - frameTimeMilli);
-        aggregatedTimeMilli += diff;
         frameTimeMilli = now;
+        aggregatedTimeMilli += diff;
 
         float animateSeconds  = 0f;// Time to simulate
         while (aggregatedTimeMilli > GRANULARITY_MILLI) {
@@ -200,15 +199,16 @@ public class Scene implements GLSurfaceView.Renderer {
         }
         fps++;
 
-        mStickman.update(now, animateSeconds);
-        mTrack.update(now, animateSeconds);
-        mObstacles.update(now, animateSeconds);
+        float secs = (now - startTimeMilli) * 0.001f;
+        mStickman.update(secs, animateSeconds);
+        mTrack.update(secs, animateSeconds);
+        mObstacles.update(secs, animateSeconds);
 
-
-        double secs = now * 0.001;
-        SimpleVector x = new SimpleVector(Math.cos(secs)*5, 0, Math.sin(secs)*5);
-        world.getCamera().setPosition(x);
-        world.getCamera().lookAt(SimpleVector.ORIGIN);
+        //secs /= 4;
+        //SimpleVector x = new SimpleVector(Math.cos(secs)*5, 0, Math.sin(secs)*5);
+        //world.getCamera().setPosition(x);
+       // world.getCamera().setOrientation(SimpleVector.create(1,0,0), SimpleVector.create(0,-1,0));
+      //  world.getCamera().lookAt(SimpleVector.ORIGIN);
     }
 
 }

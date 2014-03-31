@@ -5,25 +5,88 @@ import android.content.res.Resources;
 
 import com.linerunner3d.R;
 import com.threed.jpct.Animation;
-import com.threed.jpct.Config;
+import com.threed.jpct.Loader;
 import com.threed.jpct.Logger;
-import com.threed.jpct.Mesh;
+import com.threed.jpct.Matrix;
+import com.threed.jpct.Object3D;
+import com.threed.jpct.SimpleVector;
 import com.threed.jpct.World;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import raft.jpct.bones.Animated3D;
-import raft.jpct.bones.AnimatedGroup;
-import raft.jpct.bones.BonesIO;
-import raft.jpct.bones.SkeletonPose;
-import raft.jpct.bones.SkinClip;
+import java.io.InputStream;
 
 /**
  * Created by simon on 29.03.14.
  */
 public class Stickman {
-    private AnimatedGroup mAnimGroup;
+
+    private Object3D mObject;
+
+    public static Stickman createStickman(Context ctx, World world) {
+        Stickman man = new Stickman();
+        Resources res = ctx.getResources();
+
+        man.mObject = load3DSModel(res.openRawResource(R.raw.stickman_pos1), 0.2f);
+
+        Animation anim = new Animation(2);
+        anim.createSubSequence("running");
+
+        anim.addKeyFrame(man.mObject.getMesh());
+        anim.addKeyFrame(load3DSModel(res.openRawResource(R.raw.stickman_pos2), 0.2f).getMesh());
+
+        man.mObject.setAnimationSequence(anim);
+        world.addObject(man.mObject);
+
+        man.mObject.rotateY((float)-Math.PI/2);
+        man.mObject.translate(0,-0.8f,0);
+
+        return man;
+    }
+
+    private int mAnimationSeq = 1;
+
+    public void run() {
+        mAnimationSeq = 1;
+    }
+
+    public void roll() {// TODO actually
+        mAnimationSeq = 2;
+    }
+
+    private float ind = 0;
+    public void update(float currentTime, float deltaTime) {
+        //float a = (float)(Math.sin(currentTime*2)+1)/2;
+        //mObject.animate(a, mAnimationSeq);
+
+        {
+            ind += 0.018f;
+            if (ind > 1f) {
+                ind -= 1f;
+            }
+        }
+        mObject.animate(ind, 1);
+    }
+
+    private static Object3D load3DSModel(InputStream in, float scale) {
+        Loader.setVertexOptimization(false);
+        Object3D[] model = Loader.load3DS(in, scale);
+
+        Object3D o3d = new Object3D(0);
+
+        Object3D temp = null;
+
+        for (int i = 0; i < model.length; i++) {
+            temp = model[i];
+            temp.setCenter(SimpleVector.ORIGIN);
+            temp.rotateX((float)( -.5*Math.PI));
+            temp.rotateMesh();
+            temp.setRotationMatrix(new Matrix());
+            o3d = Object3D.mergeObjects(o3d, temp);
+            o3d.build();
+        }
+        return o3d;
+    }
+
+    /*private AnimatedGroup mAnimGroup;
 
     private static final boolean MESH_ANIM_ALLOWED = false;
 
@@ -130,5 +193,5 @@ public class Stickman {
             }
 
         }
-    }
+    }*/
 }

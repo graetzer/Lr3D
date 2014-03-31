@@ -40,7 +40,7 @@ public class Obstacles {
         difficulty = (float)Math.max(0, Math.min(1.0, x));
     }
 
-    private float mSpeed = 0.1f;
+    private float mSpeed = 0.3f;
     public void update(float currentTime, float deltaTime) {
         mDistance = (1.f - difficulty) * 5.f + 0.5f;
 
@@ -58,7 +58,7 @@ public class Obstacles {
     private void place(Object3D ob) {
 
         int i = mBoxes.indexOf(ob);
-        ob.setOrigin(SimpleVector.create(i*mDistance + 10, 1, 0 ));
+        ob.setOrigin(SimpleVector.create(i*mDistance + 10, -1, 0 ));
 
     }
 }
